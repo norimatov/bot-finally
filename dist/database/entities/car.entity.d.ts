@@ -1,0 +1,32 @@
+import { User } from './user.entity';
+import { CarInsurance } from './insurance.entity';
+import { Lead } from './lead.entity';
+export declare class Car {
+    id: number;
+    plateNumber: string;
+    secondPlateNumber: string;
+    ownerName: string;
+    ownerPhone: string;
+    secondPhone: string;
+    techPhoto: string;
+    techBackPhoto: string;
+    carPhoto: string;
+    guarantorName: string;
+    guarantorPhone: string;
+    brand: string;
+    model: string;
+    year: number;
+    moderationStatus: string;
+    moderatedBy: User;
+    moderatedById: number;
+    moderatedAt: Date;
+    rejectionReason: string;
+    submittedBy: User;
+    submittedById: number;
+    createdBy: User;
+    createdById: number;
+    createdAt: Date;
+    updatedAt: Date;
+    insurances: CarInsurance[];
+    leads: Lead[];
+}

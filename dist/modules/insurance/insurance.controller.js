@@ -1,0 +1,105 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InsuranceController = void 0;
+const common_1 = require("@nestjs/common");
+const insurance_service_1 = require("./insurance.service");
+let InsuranceController = class InsuranceController {
+    constructor(insuranceService) {
+        this.insuranceService = insuranceService;
+    }
+    async findAll() {
+        return this.insuranceService.findAll();
+    }
+    async getActive() {
+        return this.insuranceService.getActive();
+    }
+    async getExpiring(days) {
+        return this.insuranceService.getExpiring(parseInt(days));
+    }
+    async getExpired() {
+        return this.insuranceService.getExpired();
+    }
+    async getStats() {
+        return this.insuranceService.getStats();
+    }
+    async findOne(id) {
+        return this.insuranceService.findOne(parseInt(id));
+    }
+    async findByCar(carId) {
+        return this.insuranceService.findByCar(parseInt(carId));
+    }
+    async updateStatus(id, status) {
+        return this.insuranceService.updateStatus(parseInt(id), status);
+    }
+};
+exports.InsuranceController = InsuranceController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InsuranceController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('active'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InsuranceController.prototype, "getActive", null);
+__decorate([
+    (0, common_1.Get)('expiring/:days'),
+    __param(0, (0, common_1.Param)('days')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], InsuranceController.prototype, "getExpiring", null);
+__decorate([
+    (0, common_1.Get)('expired'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InsuranceController.prototype, "getExpired", null);
+__decorate([
+    (0, common_1.Get)('stats'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InsuranceController.prototype, "getStats", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], InsuranceController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Get)('car/:carId'),
+    __param(0, (0, common_1.Param)('carId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], InsuranceController.prototype, "findByCar", null);
+__decorate([
+    (0, common_1.Put)(':id/status/:status'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], InsuranceController.prototype, "updateStatus", null);
+exports.InsuranceController = InsuranceController = __decorate([
+    (0, common_1.Controller)('insurances'),
+    __metadata("design:paramtypes", [insurance_service_1.InsuranceService])
+], InsuranceController);
+//# sourceMappingURL=insurance.controller.js.map

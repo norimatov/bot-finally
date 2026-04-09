@@ -1,0 +1,31 @@
+import { Repository } from 'typeorm';
+import { CarInsurance } from '../../database/entities/insurance.entity';
+import { Car } from '../../database/entities/car.entity';
+export declare class InsuranceService {
+    private insuranceRepo;
+    private carRepo;
+    constructor(insuranceRepo: Repository<CarInsurance>, carRepo: Repository<Car>);
+    findAll(): Promise<CarInsurance[]>;
+    findAllWithDetails(): Promise<CarInsurance[]>;
+    findOne(id: number): Promise<CarInsurance>;
+    findByCar(carId: number): Promise<CarInsurance[]>;
+    findByType(type: string): Promise<CarInsurance[]>;
+    getActive(): Promise<CarInsurance[]>;
+    getExpiring(days: number): Promise<CarInsurance[]>;
+    getExpired(): Promise<CarInsurance[]>;
+    getRenewed(): Promise<CarInsurance[]>;
+    getActiveByCar(carId: number): Promise<CarInsurance | null>;
+    getStats(): Promise<any>;
+    getStatsByType(): Promise<any>;
+    updateStatus(id: number, status: string): Promise<CarInsurance>;
+    getTodayCount(): Promise<number>;
+    getMonthCount(): Promise<number>;
+    create(data: Partial<CarInsurance>): Promise<CarInsurance>;
+    update(id: number, data: Partial<CarInsurance>): Promise<CarInsurance>;
+    delete(id: number): Promise<void>;
+    getCarActiveInsurance(carId: number): Promise<CarInsurance | null>;
+    findByDaysLeft(days: number): Promise<CarInsurance[]>;
+    cleanOldInsurances(days?: number): Promise<number>;
+    getCarsWithInsurance(): Promise<any[]>;
+    getExpirationStats(): Promise<any>;
+}

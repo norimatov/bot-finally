@@ -1,0 +1,33 @@
+import { Car } from './car.entity';
+import { CarInsurance } from './insurance.entity';
+import { User } from './user.entity';
+export declare class Lead {
+    id: number;
+    car: Car;
+    carId: number;
+    insurance: CarInsurance;
+    insuranceId: number;
+    operator: User;
+    operatorId: number;
+    leadType: string;
+    type: string;
+    status: string;
+    daysRemaining: number;
+    lastCallAt: Date;
+    callCount: number;
+    callDuration: number;
+    callResult: string;
+    remindAt: Date;
+    remindNote: string;
+    reminded: boolean;
+    customerComment: string;
+    nextAction: string;
+    nextActionDate: Date;
+    responseTime: number;
+    followUpCount: number;
+    lastFollowUp: Date;
+    notes: string;
+    closedAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+}

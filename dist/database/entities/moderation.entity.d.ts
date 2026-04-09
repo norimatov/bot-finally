@@ -1,0 +1,31 @@
+import { User } from './user.entity';
+import { Car } from './car.entity';
+export declare class Moderation {
+    id: number;
+    car: Car;
+    carId: number;
+    plateNumber: string;
+    ownerName: string;
+    ownerPhone: string;
+    secondPhone: string;
+    techPhoto: string;
+    techBackPhoto: string;
+    carPhoto: string;
+    insuranceType: string;
+    startDate: Date;
+    endDate: Date;
+    status: 'pending' | 'approved' | 'rejected';
+    submittedBy: User;
+    submittedById: number;
+    registrarTelegramId: string;
+    registrarName: string;
+    moderatedBy: User;
+    moderatedById: number;
+    moderatedAt: Date;
+    rejectionReason: string;
+    rejectionField: string;
+    expiresAt: Date;
+    notifiedOperators: string[];
+    additionalData: any;
+    createdAt: Date;
+}
