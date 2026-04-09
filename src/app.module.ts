@@ -31,11 +31,11 @@ import { ModerationModule } from './modules/moderation/moderation.module'; // ü
 @Module({
   imports: [
     // Konfiguratsiya - .env faylni yuklash
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env'
     }),
-    
+
     // PostgreSQL ma'lumotlar bazasi
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -64,23 +64,23 @@ import { ModerationModule } from './modules/moderation/moderation.module'; // ü
         retryDelay: 3000,      // Urinishlar orasidagi vaqt (ms)
       }),
     }),
-    
+
     // Schedule moduli - avtomatik ishlar uchun
     ScheduleModule.forRoot(),
-    
+
     // Telegram bot - SESSION BILAN
     TelegrafModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const token = config.get<string>('BOT_TOKEN');
-        
+
         if (!token) {
           throw new Error('‚ùå BOT_TOKEN topilmadi! .env faylini tekshiring.');
         }
-        
+
         console.log('ü§ñ Bot token tekshirildi');
-        
+
         return {
           token,
           middlewares: [session()],  // ‚úÖ Session middleware - MUHIM!
@@ -90,7 +90,7 @@ import { ModerationModule } from './modules/moderation/moderation.module'; // ü
         };
       },
     }),
-    
+
     // Feature modullari
     BotModule,
     UserModule,
@@ -104,4 +104,4 @@ import { ModerationModule } from './modules/moderation/moderation.module'; // ü
     ModerationModule, // üî• MODERATION MODULE QO'SHILDI
   ],
 })
-export class AppModule {}
+export class AppModule { }
