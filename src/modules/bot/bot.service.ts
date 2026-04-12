@@ -169,45 +169,43 @@ export class BotService {
   /**
    * 🔥 YANGILANGAN: Xabar yuborish (implementatsiya)
    * TUGMALARNI TO'G'RI ISHLATISH UCHUN YANGILANDI
+   * 🔥 RASMLAR UCHUN link_preview_options QO'SHILDI (Telegraf yangi versiyasi uchun)
    */
   async sendMessage(telegramId: string, message: string, keyboard?: any): Promise<boolean> {
     try {
       const options: any = {
-        parse_mode: 'HTML'
+        parse_mode: 'HTML',
+        // 🔥 YANGI: link_preview_options (disable_web_page_preview o'rniga)
+        link_preview_options: {
+          is_disabled: true,  // Web page preview ni o'chiradi
+        },
       };
 
       if (keyboard) {
         // 🔥 MUHIM: keyboard ni to'g'ri formatda uzatish
-        // Agar keyboard allaqachon Telegraf Markup obyekti bo'lsa
         if (keyboard && typeof keyboard === 'object') {
-          // Telegraf Markup.inlineKeyboard() qaytargan obyekt
           if (keyboard.reply_markup) {
             options.reply_markup = keyboard.reply_markup;
-          }
-          // To'g'ridan-to'g'ri inline_keyboard yoki keyboard
-          else if (keyboard.inline_keyboard || keyboard.keyboard) {
+          } else if (keyboard.inline_keyboard || keyboard.keyboard) {
             options.reply_markup = keyboard;
-          }
-          // Oddiy obyekt bo'lsa
-          else {
+          } else {
             options.reply_markup = keyboard;
           }
         } else {
           options.reply_markup = keyboard;
         }
 
-        // Debug uchun
         console.log('📤 Xabar yuborilmoqda:', {
           telegramId,
           hasKeyboard: !!keyboard,
-          replyMarkup: JSON.stringify(options.reply_markup)
         });
       }
 
       await this.bot.telegram.sendMessage(telegramId, message, options);
       return true;
     } catch (error) {
-      console.error(`❌ Error sending message to ${telegramId}:`, error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Noma\'lum xatolik';
+      console.error(`❌ Error sending message to ${telegramId}:`, errorMessage);
       return false;
     }
   }
@@ -223,11 +221,13 @@ export class BotService {
 
       await this.bot.telegram.sendMessage(telegramId, message, {
         parse_mode: 'HTML',
+        link_preview_options: { is_disabled: true },
         reply_markup: keyboard
       });
       return true;
     } catch (error) {
-      console.error(`❌ Error sending inline keyboard to ${telegramId}:`, error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Noma\'lum xatolik';
+      console.error(`❌ Error sending inline keyboard to ${telegramId}:`, errorMessage);
       return false;
     }
   }
@@ -244,11 +244,13 @@ export class BotService {
 
       await this.bot.telegram.sendMessage(telegramId, message, {
         parse_mode: 'HTML',
+        link_preview_options: { is_disabled: true },
         reply_markup: keyboard
       });
       return true;
     } catch (error) {
-      console.error(`❌ Error sending reply keyboard to ${telegramId}:`, error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Noma\'lum xatolik';
+      console.error(`❌ Error sending reply keyboard to ${telegramId}:`, errorMessage);
       return false;
     }
   }
@@ -278,7 +280,8 @@ export class BotService {
         }
       }
     } catch (error) {
-      console.error('❌ Error sending to admins:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Noma\'lum xatolik';
+      console.error('❌ Error sending to admins:', errorMessage);
     }
   }
 

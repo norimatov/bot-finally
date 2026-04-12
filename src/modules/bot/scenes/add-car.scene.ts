@@ -36,7 +36,7 @@ interface TempCarData {
   customStartDate?: string;
   customEndDate?: string;
   waitingForDate?: 'start' | 'end';
-  
+
   phoneErrorCount?: number;
 }
 
@@ -168,7 +168,7 @@ export class AddCarScene {
         if (!PhoneUtil.validate(text)) {
           data.phoneErrorCount = (data.phoneErrorCount || 0) + 1;
           this.tempData.set(userId, data);
-          
+
           if (data.phoneErrorCount >= 3) {
             await ctx.reply(
               '❌ Telefon raqam noto\'g\'ri formatda!\n\n' +
@@ -563,20 +563,33 @@ export class AddCarScene {
       await this.downloadFile(techBackPhotoLink.href, techBackPhotoPath);
       await this.downloadFile(carPhotoLink.href, carPhotoPath);
 
-      const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+      // 🔥 BASE URL - HTTPS (Render uchun)
+      const baseUrl = process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || 'https://your-app.onrender.com';
+
       const techRelativePath = `/uploads/cars/${data.plate}/${path.basename(techPhotoPath)}`;
       const techBackRelativePath = `/uploads/cars/${data.plate}/${path.basename(techBackPhotoPath)}`;
       const carRelativePath = `/uploads/cars/${data.plate}/${path.basename(carPhotoPath)}`;
 
-      // MODERATSIYA MA'LUMOTLARI
+      // 🔥 TO'LIQ URL LAR (HTTPS)
+      const techPhotoFullUrl = `${baseUrl}${techRelativePath}`;
+      const techBackPhotoFullUrl = `${baseUrl}${techBackRelativePath}`;
+      const carPhotoFullUrl = `${baseUrl}${carRelativePath}`;
+
+      console.log('📸 Rasm URL lar:', {
+        techPhoto: techPhotoFullUrl,
+        techBackPhoto: techBackPhotoFullUrl,
+        carPhoto: carPhotoFullUrl
+      });
+
+      // MODERATSIYA MA'LUMOTLARI (TO'LIQ URL BILAN)
       const moderationData = {
         plateNumber: data.plate!,
         ownerName: data.ownerName!,
         ownerPhone: data.mainPhone!,
         secondPhone: data.secondPhone || null,
-        techPhoto: techRelativePath,
-        techBackPhoto: techBackRelativePath,
-        carPhoto: carRelativePath,
+        techPhoto: techPhotoFullUrl,        // 🔥 To'liq URL
+        techBackPhoto: techBackPhotoFullUrl, // 🔥 To'liq URL
+        carPhoto: carPhotoFullUrl,          // 🔥 To'liq URL
         insuranceType: data.insuranceType!,
         startDate: data.startDate!,
         endDate: data.endDate!,
@@ -589,7 +602,10 @@ export class AddCarScene {
       console.log('📤 Moderatsiyaga yuborilmoqda:', {
         plateNumber: moderationData.plateNumber,
         registrar: moderationData.registrarName,
-        insuranceType: moderationData.insuranceType
+        insuranceType: moderationData.insuranceType,
+        hasTechPhoto: !!moderationData.techPhoto,
+        hasTechBackPhoto: !!moderationData.techBackPhoto,
+        hasCarPhoto: !!moderationData.carPhoto
       });
 
       // MODERATSIYAGA YUBORISH (OPERATORLARGA XABAR KETADI)
