@@ -26,15 +26,59 @@ export class BotService implements OnModuleInit {
   }
 
   /**
-   * 🔥 MODULE INIT - Botni ishga tushirish (Render uchun muhim)
+   * 🔥 MODULE INIT - Botni ishga tushirish (409 Conflict xatosi uchun kuchaytirilgan versiya)
    */
   async onModuleInit() {
     try {
-      await this.bot.launch();
+      const botToken = this.configService.get<string>('BOT_TOKEN');
+      
+      // 1. Avval botni to'xtatish (agar ishlayotgan bo'lsa)
+      try {
+        await this.bot.stop();
+        console.log('⏹️ Bot to\'xtatildi');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (stopError) {
+        const stopErrorMessage = stopError instanceof Error ? stopError.message : 'Noma\'lum xatolik';
+        console.log('⚠️ Bot to\'xtatilmadi (ishlamayotgan bo\'lishi mumkin):', stopErrorMessage);
+      }
+      
+      // 2. Webhook tozalash (drop_pending_updates bilan)
+      if (botToken) {
+        const deleteResponse = await fetch(`https://api.telegram.org/bot${botToken}/deleteWebhook?drop_pending_updates=true`);
+        const deleteData = await deleteResponse.json();
+        if (deleteData.ok) {
+          console.log('✅ Webhook tozalandi');
+        } else {
+          console.log('⚠️ Webhook tozalash javobi:', deleteData);
+        }
+        
+        // 3. Kutilayotgan xabarlarni tozalash
+        const getUpdatesResponse = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates?offset=-1&timeout=1`);
+        const getUpdatesData = await getUpdatesResponse.json();
+        if (getUpdatesData.ok) {
+          console.log('📋 Kutilayotgan xabarlar tozalandi');
+        }
+        
+        // 4. Bot to'liq to'xtashi uchun biroz kutish
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+      
+      // 5. Botni ishga tushirish (dropPendingUpdates bilan)
+      await this.bot.launch({
+        dropPendingUpdates: true,
+      });
       console.log('✅ Telegram bot ishga tushdi (long polling)');
+      
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Noma\'lum xatolik';
       console.error('❌ Bot ishga tushmadi:', errorMessage);
+      
+      // Agar 409 xatosi bo'lsa, qo'shimcha ma'lumot
+      if (errorMessage.includes('409') || errorMessage.includes('Conflict')) {
+        console.error('⚠️ 409 Conflict xatosi: Bot boshqa joyda ishlayotgan bo\'lishi mumkin!');
+        console.error('   Yechim: Lokal botni to\'xtating yoki Render\'da Restart Service bosing');
+        console.error('   Yoki BotFather dan /revoke qilib yangi token oling');
+      }
     }
   }
 
