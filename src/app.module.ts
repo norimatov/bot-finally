@@ -42,6 +42,10 @@ import { ModerationModule } from './modules/moderation/moderation.module'; // ðŸ
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
+        url: config.get('DATABASE_URL'),
+        ssl: {
+          rejectUnauthorized: false,
+        },
         host: config.get<string>('DB_HOST', 'localhost'),
         port: config.get<number>('DB_PORT', 5432),
         username: config.get<string>('DB_USERNAME', 'postgres'),
