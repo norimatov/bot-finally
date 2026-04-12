@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../database/entities/user.entity';
@@ -15,7 +15,7 @@ export interface SendMessageOptions {
 }
 
 @Injectable()
-export class BotService {
+export class BotService implements OnModuleInit {
   constructor(
     @InjectBot() private readonly bot: Telegraf,
     @InjectRepository(User) private userRepo: Repository<User>,
@@ -23,6 +23,19 @@ export class BotService {
     private configService: ConfigService,
   ) {
     console.log('🤖 BotService yaratildi');
+  }
+
+  /**
+   * 🔥 MODULE INIT - Botni ishga tushirish (Render uchun muhim)
+   */
+  async onModuleInit() {
+    try {
+      await this.bot.launch();
+      console.log('✅ Telegram bot ishga tushdi (long polling)');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Noma\'lum xatolik';
+      console.error('❌ Bot ishga tushmadi:', errorMessage);
+    }
   }
 
   /**
