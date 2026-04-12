@@ -60,23 +60,35 @@ async function bootstrap() {
     process.exit(1);
   }
 
-  // Webhook tozalash (Render uchun muhim)
+  // 🔥 Webhook tozalash - Kuchaytirilgan versiya (409 Conflict xatosi uchun)
   try {
-    console.log('🔄 Webhook tozalanmoqda...');
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/deleteWebhook`);
-    const data = await response.json();
-    if (data.ok) {
+    console.log('🔄 Webhook tozalanmoqda va kutilayotgan xabarlar tozalanmoqda...');
+
+    // 1. Webhook tozalash (drop_pending_updates bilan)
+    const deleteResponse = await fetch(`https://api.telegram.org/bot${botToken}/deleteWebhook?drop_pending_updates=true`);
+    const deleteData = await deleteResponse.json();
+
+    if (deleteData.ok) {
       console.log('✅ Webhook tozalandi');
     } else {
-      console.log('⚠️ Webhook tozalash javobi:', data);
+      console.log('⚠️ Webhook tozalash javobi:', deleteData);
     }
+
+    // 2. Kutilayotgan xabarlarni tozalash (getUpdates orqali)
+    const getUpdatesResponse = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates?offset=-1&timeout=1`);
+    const getUpdatesData = await getUpdatesResponse.json();
+
+    if (getUpdatesData.ok) {
+      console.log('📋 Kutilayotgan xabarlar tozalandi');
+    }
+
+    // 3. Bot to'liq to'xtashi uchun biroz kutish
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Noma\'lum xatolik';
     console.error('❌ Webhook tozalashda xatolik:', errorMessage);
   }
-
-  // Bot ishga tushishi uchun biroz kutish
-  await new Promise(resolve => setTimeout(resolve, 1000));
 
   // HTTP serverni ishga tushirish (Render port binding uchun MUHIM)
   await app.listen(port, '0.0.0.0');
@@ -130,6 +142,7 @@ async function bootstrap() {
 
   console.log('\n✅ Bot tayyor!');
   console.log('💡 Bot Telegram orqali ishlaydi, HTTP server esa Render uchun port binding qiladi\n');
+  console.log('⚠️ Eslatma: Agar 409 Conflict xatosi chiqsa, bot boshqa joyda ishlayotganligini tekshiring!');
 }
 
 bootstrap().catch(error => {
