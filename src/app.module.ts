@@ -14,7 +14,7 @@ import { Kpi } from './database/entities/kpi.entity';
 import { Notification } from './database/entities/notification.entity';
 import { DailyStat } from './database/entities/daily-stat.entity';
 import { BotSession } from './database/entities/bot-session.entity';
-import { Moderation } from './database/entities/moderation.entity'; // 🔥 MODERATION ENTITY QO'SHILDI
+import { Moderation } from './database/entities/moderation.entity';
 
 // Modules
 import { BotModule } from './modules/bot/bot.module';
@@ -26,7 +26,7 @@ import { KpiModule } from './modules/kpi/kpi.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { TelegramModule } from './telegram/telegram.module';
-import { ModerationModule } from './modules/moderation/moderation.module'; // 🔥 MODERATION MODULE QO'SHILDI
+import { ModerationModule } from './modules/moderation/moderation.module';
 
 @Module({
   imports: [
@@ -36,37 +36,66 @@ import { ModerationModule } from './modules/moderation/moderation.module'; // �
       envFilePath: '.env'
     }),
 
-    // PostgreSQL ma'lumotlar bazasi
+    // PostgreSQL ma'lumotlar bazasi - 🔥 RENDER UCHUN TUZATILDI
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        url: config.get('DATABASE_URL'),
-        ssl: {
-          rejectUnauthorized: false,
-        },
-        host: config.get<string>('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5432),
-        username: config.get<string>('DB_USERNAME', 'postgres'),
-        password: config.get<string>('DB_PASSWORD', 'root1'),
-        database: config.get<string>('DB_DATABASE', 'insurance_db'),
-        entities: [
-          User,
-          Car,
-          CarInsurance,
-          Lead,
-          Kpi,
-          Notification,
-          DailyStat,
-          BotSession,
-          Moderation, // 🔥 MODERATION ENTITY QO'SHILDI
-        ],
-        synchronize: config.get<string>('NODE_ENV') === 'development', // developmentda true
-        logging: config.get<string>('NODE_ENV') === 'development',     // developmentda true
-        retryAttempts: 5,      // Qayta urinishlar soni
-        retryDelay: 3000,      // Urinishlar orasidagi vaqt (ms)
-      }),
+      useFactory: (config: ConfigService) => {
+        // 🔥 PRIORITET: Avval DATABASE_URL ni tekshir (Render uchun)
+        const databaseUrl = config.get<string>('DATABASE_URL');
+
+        if (databaseUrl) {
+          console.log('✅ DATABASE_URL orqali ulanish');
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            entities: [
+              User,
+              Car,
+              CarInsurance,
+              Lead,
+              Kpi,
+              Notification,
+              DailyStat,
+              BotSession,
+              Moderation,
+            ],
+            synchronize: true,
+            logging: false,
+            ssl: {
+              rejectUnauthorized: false,  // 🔥 RENDER UCHUN MUHIM!
+            },
+            retryAttempts: 10,
+            retryDelay: 3000,
+          };
+        }
+
+        // 🔥 Agar DATABASE_URL bo'lmasa, local ulanish
+        console.log('📁 Local database ulanishi');
+        return {
+          type: 'postgres',
+          host: config.get<string>('DB_HOST', 'localhost'),
+          port: config.get<number>('DB_PORT', 5432),
+          username: config.get<string>('DB_USERNAME', 'postgres'),
+          password: config.get<string>('DB_PASSWORD', 'root1'),
+          database: config.get<string>('DB_DATABASE', 'insurance_db'),
+          entities: [
+            User,
+            Car,
+            CarInsurance,
+            Lead,
+            Kpi,
+            Notification,
+            DailyStat,
+            BotSession,
+            Moderation,
+          ],
+          synchronize: config.get<string>('NODE_ENV') === 'development',
+          logging: config.get<string>('NODE_ENV') === 'development',
+          retryAttempts: 5,
+          retryDelay: 3000,
+        };
+      },
     }),
 
     // Schedule moduli - avtomatik ishlar uchun
@@ -87,9 +116,9 @@ import { ModerationModule } from './modules/moderation/moderation.module'; // �
 
         return {
           token,
-          middlewares: [session()],  // ✅ Session middleware - MUHIM!
+          middlewares: [session()],
           launchOptions: {
-            dropPendingUpdates: true  // Bot ishga tushganda kutilayotgan xabarlarni o'chirish
+            dropPendingUpdates: true
           }
         };
       },
@@ -105,7 +134,7 @@ import { ModerationModule } from './modules/moderation/moderation.module'; // �
     NotificationModule,
     AdminModule,
     TelegramModule,
-    ModerationModule, // 🔥 MODERATION MODULE QO'SHILDI
+    ModerationModule,
   ],
 })
 export class AppModule { }
