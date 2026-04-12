@@ -36,12 +36,11 @@ import { ModerationModule } from './modules/moderation/moderation.module';
       envFilePath: '.env'
     }),
 
-    // PostgreSQL ma'lumotlar bazasi - 🔥 RENDER UCHUN TUZATILDI
+    // PostgreSQL ma'lumotlar bazasi - 🔥 RENDER UCHUN QAT'IY TUZATILDI
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        // 🔥 PRIORITET: Avval DATABASE_URL ni tekshir (Render uchun)
         const databaseUrl = config.get<string>('DATABASE_URL');
 
         if (databaseUrl) {
@@ -50,27 +49,27 @@ import { ModerationModule } from './modules/moderation/moderation.module';
             type: 'postgres',
             url: databaseUrl,
             entities: [
-              User,
-              Car,
-              CarInsurance,
-              Lead,
-              Kpi,
-              Notification,
-              DailyStat,
-              BotSession,
-              Moderation,
+              User, Car, CarInsurance, Lead, Kpi,
+              Notification, DailyStat, BotSession, Moderation
             ],
             synchronize: true,
             logging: false,
-            ssl: {
-              rejectUnauthorized: false,  // 🔥 RENDER UCHUN MUHIM!
-            },
             retryAttempts: 10,
             retryDelay: 3000,
+            // 🔥 SSL sozlamalari - self-signed certificate uchun
+            ssl: {
+              rejectUnauthorized: false,
+            },
+            // 🔥 Qo'shimcha sozlamalar
+            extra: {
+              ssl: {
+                rejectUnauthorized: false,
+              },
+            },
           };
         }
 
-        // 🔥 Agar DATABASE_URL bo'lmasa, local ulanish
+        // Local ulanish
         console.log('📁 Local database ulanishi');
         return {
           type: 'postgres',
@@ -80,28 +79,19 @@ import { ModerationModule } from './modules/moderation/moderation.module';
           password: config.get<string>('DB_PASSWORD', 'root1'),
           database: config.get<string>('DB_DATABASE', 'insurance_db'),
           entities: [
-            User,
-            Car,
-            CarInsurance,
-            Lead,
-            Kpi,
-            Notification,
-            DailyStat,
-            BotSession,
-            Moderation,
+            User, Car, CarInsurance, Lead, Kpi,
+            Notification, DailyStat, BotSession, Moderation
           ],
-          synchronize: config.get<string>('NODE_ENV') === 'development',
-          logging: config.get<string>('NODE_ENV') === 'development',
+          synchronize: true,
+          logging: true,
           retryAttempts: 5,
           retryDelay: 3000,
         };
       },
     }),
 
-    // Schedule moduli - avtomatik ishlar uchun
     ScheduleModule.forRoot(),
 
-    // Telegram bot - SESSION BILAN
     TelegrafModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -124,7 +114,6 @@ import { ModerationModule } from './modules/moderation/moderation.module';
       },
     }),
 
-    // Feature modullari
     BotModule,
     UserModule,
     CarModule,
